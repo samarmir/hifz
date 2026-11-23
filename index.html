@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#101a18">
+<title>Surah ʿAbasa – Memorisation</title>
+<style>
+:root{color-scheme:dark;--bg:#101a18;--panel:#1b2925;--line:#33443d;--ink:#f4f0e5;--muted:#aab8ae;--accent:#c8aa70;--cover:#42534b;--ar-scale:1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:22px 14px 40px}
+main{max-width:760px;margin:auto}.top{text-align:center;margin:8px 0 22px}.eyebrow{color:var(--accent);font-size:12px;letter-spacing:.16em;text-transform:uppercase}.top h1{font-family:Georgia,serif;font-weight:500;font-size:30px;margin:7px 0}.subtitle{color:var(--muted);font-size:13px}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center;margin:18px 0}.controls button{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:10px 15px;border-radius:10px;font-size:14px;cursor:pointer}.controls button.active{border-color:var(--accent);color:var(--accent)}.font-size-val{font-size:13px;color:var(--muted);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+.progress-wrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:15px}.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:8px}.track{height:5px;border-radius:8px;background:#35443e;overflow:hidden}.bar{height:100%;width:0;background:var(--accent);transition:width .15s}
+.hint{text-align:center;color:var(--muted);font-size:12px;margin:0 0 16px}
+.ayah{position:relative;display:flex;align-items:stretch;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:9px 0;min-height:72px;padding:12px 13px;overflow:hidden}
+.num{flex:0 0 31px;align-self:flex-start;width:31px;height:31px;border:1px solid #6d765f;border-radius:50%;display:grid;place-items:center;color:var(--accent);font-size:12px;font-variant-numeric:tabular-nums;margin-top:5px}
+.verse-box{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:48px}
+.arabic-area{position:relative;flex:1;min-width:0;display:flex;align-items:center;min-height:48px}
+.arabic{width:100%;direction:rtl;text-align:right;font-family:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif;font-size:calc(clamp(25px,6vw,34px) * var(--ar-scale));line-height:1.9;word-spacing:2px;unicode-bidi:plaintext}
+.extra-text{width:100%;direction:ltr;text-align:left;font-size:calc(16px * var(--ar-scale));line-height:1.6}
+.extra-text[contenteditable="true"]{outline:1px dashed #6d765f;border-radius:6px;padding:4px 6px}
+.edit-btn{position:relative;z-index:3;flex:0 0 auto;border:1px solid var(--line);background:#243530;color:var(--muted);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer}
+.cover{position:absolute;z-index:2;top:0;bottom:0;left:0;width:100%;min-width:18px;background:var(--cover);border:1px solid #738276;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#e2e6dd;font-size:12px;letter-spacing:.03em;touch-action:none;user-select:none;-webkit-user-select:none;cursor:ew-resize;overflow:hidden}
+.cover.ltr-cover{left:auto;right:0}
+.cover span{pointer-events:none;white-space:nowrap}.cover.done{display:none}
+.ayah.revealed{border-color:#756744}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:22px;line-height:1.7}
+@media(min-width:600px){body{padding-top:30px}.ayah{padding:14px 18px}.arabic{font-size:calc(36px * var(--ar-scale))}}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div class="eyebrow">Qur’an memorisation practice · 80</div><h1>سُورَةُ عَبَسَ</h1><div class="subtitle">Surah ʿAbasa · 42 ayat</div></header>
+<div class="controls">
+<button id="modeAr" class="active" type="button">Arabic</button>
+<button id="modeTr" type="button">Transliteration</button>
+<button id="modeEn" type="button">English</button>
+<button id="reset" type="button">Reset all ayat</button><button id="revealAll" type="button">Reveal all</button><button id="fontSmaller" type="button">-</button><span id="fontSizeLabel" class="font-size-val">100%</span><button id="fontBigger" type="button">+</button>
+</div>
+<section class="progress-wrap" aria-live="polite"><div class="progress-label"><span>Revealed</span><span id="count">0 / 42</span></div><div class="track"><div class="bar" id="bar"></div></div></section>
+<p id="hint" class="hint">Drag anywhere on a cover: slide LEFT to reveal more, or RIGHT to hide it again.</p>
+<section id="verses" aria-label="Surah Abasa ayat"></section>
+<p class="footer">Made with Gemini · v1.10<br>Your progress is saved on this device in this browser.<br>To practise another surah later, replace the ayat in the <b>surahData</b> list in this HTML file.</p>
+</main>
+<script>
+const surahData = [
+'عَبَسَ وَتَوَلَّىٰٓ',
+'أَن جَآءَهُ ٱلْأَعْمَىٰ',
+'وَمَا يُدْرِيكَ لَعَلَّهُۥ يَزَّكَّىٰٓ',
+'أَوْ يَذَّكَّرُ فَتَنفَعَهُ ٱلذِّكْرَىٰٓ',
+'أَمَّا مَنِ ٱسْتَغْنَىٰ',
+'فَأَنتَ لَهُۥ تَصَدَّىٰ',
+'وَمَا عَلَيْكَ أَلَّا يَزَّكَّىٰ',
+'وَأَمَّا مَن جَآءَكَ يَسْعَىٰ',
+'وَهُوَ يَخْشَىٰ',
+'فَأَنتَ عَنْهُ تَلَهَّىٰ',
+'كَلَّآ إِنَّهَا تَذْكِرَةٌ',
+'فَمَن شَآءَ ذَكَرَهُۥ',
+'فِى صُحُفٍ مُّكَرَّمَةٍ',
+'مَّرْفُوعَةٍ مُّطَهَّرَةٍ',
+'بِأَيْدِى سَفَرَةٍ',
+'كِرَامٍ بَرَرَةٍ',
+'قُتِلَ ٱلْإِنسَٰنُ مَآ أَكْفَرَهُۥ',
+'مِنْ أَىِّ شَىْءٍ خَلَقَهُۥ',
+'مِن نُّطْفَةٍ خَلَقَهُۥ فَقَدَّرَهُۥ',
+'ثُمَّ ٱلسَّبِيلَ يَسَّرَهُۥ',
+'ثُمَّ أَمَاتَهُۥ فَأَقْبَرَهُۥ',
+'ثُمَّ إِذَا شَآءَ أَنشَرَهُۥ',
+'كَلَّا لَمَّا يَقْضِ مَآ أَمَرَهُۥ',
+'فَلْيَنظُرِ ٱلْإِنسَٰنُ إِلَىٰ طَعَامِهِۦٓ',
+'أَنَّا صَبَبْنَا ٱلْمَآءَ صَبًّۭا',
+'ثُمَّ شَقَقْنَا ٱلْأَرْضَ شَقًّۭا',
+'فَأَنۢبَتْنَا فِيهَا حَبًّۭا',
+'وَعِنَبًۭا وَقَضْبًۭا',
+'وَزَيْتُونًۭا وَنَخْلًۭا',
+'وَحَدَآئِقَ غُلْبًۭا',
+'وَفَٰكِهَةًۭ وَأَبًّۭا',
+'مَّتَٰعًۭا لَّكُمْ وَلِأَنْعَٰمِكُمْ',
+'فَإِذَا جَآءَتِ ٱلصَّآخَّةُ',
+'يَوْمَ يَفِرُّ ٱلْمَرْءُ مِنْ أَخِيهِ',
+'وَأُمِّهِۦ وَأَبِيهِ',
+'وَصَٰحِبَتِهِۦ وَبَنِيهِ',
+'لِكُلِّ ٱمْرِئٍ مِّنْهُمْ يَوْمَئِذٍۢ شَأْنٌۭ يُغْنِيهِ',
+'وُجُوهٌۭ يَوْمَئِذٍۢ مُّسْفِرَةٌۭ',
+'ضَاحِكَةٌۭ مُّسْتَبْشِرَةٌۭ',
+'وَوُجُوهٌۭ يَوْمَئِذٍ عَلَيْهَا غَبَرَةٌۭ',
+'تَرْهَقُهَا قَتَرَةٌ',
+'أُو۟لَٰٓئِكَ هُمُ ٱلْكَفَرَةُ ٱلْفَجَرَةُ'
+];
+const transliterationData = [
+"'Abasa wa tawallaa.",
+"An jaa-ahul 'a-maa",
+"Wa maa yudreeka la'allahu yaz zakkaa.",
+"Aw yazzakkaru fatanfa 'ahuz zikraa.",
+"Amma manis taghnaa",
+"Fa-anta lahu tasaddaa",
+"Wa ma 'alaika allaa yaz zakka.",
+"Wa amma man jaa-aka yas'a",
+"Wahuwa yakhshaa,",
+"Fa-anta 'anhu talah haa.",
+"Kalla innaha tazkirah",
+"Faman shaa a zakarah",
+"Fi suhufim mukar rama,",
+"Marfoo'atim mutah hara,",
+"Bi'aidee safara",
+"Kiraamim bararah.",
+"Qutilal-insanu maa akfarah.",
+"Min aiyyi shai-in Khalaq",
+"Min nutfatin khalaqahoo faqaddarah.",
+"Thummas sabeela yas-sarah",
+"Thumma amatahu fa-aqbarah",
+"Thumma iza shaa-a ansharah",
+"Kalla lamma yaqdi maa amarah.",
+"Falyanzuril insanu ilaa ta-amih",
+"Anna sabab nalmaa-a sabba.",
+"Thumma sha qaqnal-arda shaqqa.",
+"Fa ambatna feeha habba",
+"Wa 'inabaw-wa qadba",
+"Wa zaitoonaw wanakh la'",
+"Wa hadaa-iqa ghulba",
+"Wa faki hataw-wa abba.",
+"Mata'al-lakum wa li-an'amikum.",
+"Faiza jaa-atis saakhah.",
+"Yauma yafir-rul mar-u min akheeh",
+"Wa ummihee wa abeeh",
+"Wa sahi batihee wa baneeh.",
+"Likul limri-im-minhum yawmaa-izin shaa nuy-yughneeh",
+"Wujoo huny-yauma-izim-musfira;",
+"Dahi katum mustab shirah",
+"Wa wujoohuy yauma-izin 'alaiha ghabar a",
+"Tarhaquha qatarah.",
+"Ulaa-ika humul-kafa ratul-fajarah."
+];
+const englishData = [
+"(The Prophet) frowned and turned away,",
+"Because there came to him the blind man (interrupting).",
+"But what could tell thee but that perchance he might grow (in spiritual understanding)?-",
+"Or that he might receive admonition, and the teaching might profit him?",
+"As to one who regards Himself as self-sufficient,",
+"To him dost thou attend;",
+"Though it is no blame to thee if he grow not (in spiritual understanding).",
+"But as to him who came to thee striving earnestly,",
+"And with fear (in his heart),",
+"Of him wast thou unmindful.",
+"By no means (should it be so)! For it is indeed a Message of instruction:",
+"Therefore let whoso will, keep it in remembrance.",
+"(It is) in Books held (greatly) in honour,",
+"Exalted (in dignity), kept pure and holy,",
+"(Written) by the hands of scribes-",
+"Honourable and Pious and Just.",
+"Woe to man! What hath made him reject Allah;",
+"From what stuff hath He created him?",
+"From a sperm-drop: He hath created him, and then mouldeth him in due proportions;",
+"Then doth He make His path smooth for him;",
+"Then He causeth him to die, and putteth him in his grave;",
+"Then, when it is His Will, He will raise him up (again).",
+"By no means hath he fulfilled what Allah hath commanded him.",
+"Then let man look at his food, (and how We provide it):",
+"For that We pour forth water in abundance,",
+"And We split the earth in fragments,",
+"And produce therein corn,",
+"And Grapes and nutritious plants,",
+"And Olives and Dates,",
+"And enclosed Gardens, dense with lofty trees,",
+"And fruits and fodder,-",
+"For use and convenience to you and your cattle.",
+"At length, when there comes the Deafening Noise,-",
+"That Day shall a man flee from his own brother,",
+"And from his mother and his father,",
+"And from his wife and his children.",
+"Each one of them, that Day, will have enough concern (of his own) to make him indifferent to the others.",
+"Some faces that Day will be beaming,",
+"Laughing, rejoicing.",
+"And other faces that Day will be dust-stained,",
+"Blackness will cover them:",
+"Such will be the Rejecters of Allah, the doers of iniquity."
+];
+let viewMode='ar';
+const tabScales={ar:1,tr:1,en:1};
+const STORAGE_KEY='abasa-memorisation-progress-v2';
+const TR_EDIT_KEY='abasa-transliteration-edits-v1';
+let saved={ar:{},tr:{},en:{}};try{const raw=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');if(raw&&typeof raw==='object')saved={ar:raw.ar||{},tr:raw.tr||{},en:raw.en||{}}}catch(e){saved={ar:{},tr:{},en:{}}}
+let trEdits={};try{const rawTr=JSON.parse(localStorage.getItem(TR_EDIT_KEY)||'{}');if(rawTr&&typeof rawTr==='object')trEdits=rawTr}catch(e){trEdits={}}
+const root=document.getElementById('verses');
+function modeSaved(){if(!saved[viewMode])saved[viewMode]={};return saved[viewMode]}
+function saveTrEdits(){try{localStorage.setItem(TR_EDIT_KEY,JSON.stringify(trEdits))}catch(e){}}
+function updateProgress(){const cur=modeSaved();const total=surahData.length;const done=surahData.filter((_,i)=>Number(cur[i])>=1).length;document.getElementById('count').textContent=`${done} / ${total}`;document.getElementById('bar').style.width=`${total?done/total*100:0}%`;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(saved))}catch(e){}}
+function setReveal(row,fraction){const cover=row.querySelector('.cover');const p=Math.max(0,Math.min(1,fraction));cover.style.width=`${(1-p)*100}%`;cover.style.display='flex';row.classList.toggle('revealed',p>=1)}
+function render(){root.innerHTML='';const cur=modeSaved();const isLtr=viewMode!=='ar';document.getElementById('hint').innerHTML=isLtr?'Drag anywhere on a cover: slide <b>RIGHT</b> to reveal more, or <b>LEFT</b> to hide it again.':'Drag anywhere on a cover: slide <b>LEFT</b> to reveal more, or <b>RIGHT</b> to hide it again.';surahData.forEach((verse,i)=>{const row=document.createElement('article');row.className='ayah';row.dataset.index=i;
+ const num=document.createElement('div');num.className='num';num.textContent=i+1;
+ const verseBox=document.createElement('div');verseBox.className='verse-box';
+ const area=document.createElement('div');area.className='arabic-area';
+ const text=document.createElement('div');
+ if(viewMode==='ar'){text.className='arabic';text.lang='ar';text.textContent=verse}
+ else if(viewMode==='tr'){text.className='extra-text';text.textContent=trEdits[i]??transliterationData[i]??''}
+ else{text.className='extra-text';text.textContent=englishData[i]??''}
+ const cover=document.createElement('div');cover.className=isLtr?'cover ltr-cover':'cover';cover.innerHTML=isLtr?'<span>Drag RIGHT to reveal · LEFT to hide</span>':'<span>Drag LEFT to reveal · RIGHT to hide</span>';
+ area.appendChild(text);area.appendChild(cover);verseBox.appendChild(area);
+ if(viewMode==='tr'){
+  const editBtn=document.createElement('button');editBtn.type='button';editBtn.className='edit-btn';editBtn.textContent='Edit';
+  editBtn.addEventListener('click',e=>{e.stopPropagation();const editing=text.contentEditable==='true';if(!editing){text.contentEditable='true';text.focus();editBtn.textContent='Save'}else{text.contentEditable='false';trEdits[i]=text.textContent;saveTrEdits();editBtn.textContent='Edit'}});
+  text.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();text.contentEditable='false';trEdits[i]=text.textContent;saveTrEdits();editBtn.textContent='Edit'}});
+  verseBox.appendChild(editBtn);
+ }
+ row.appendChild(num);row.appendChild(verseBox);root.appendChild(row);
+ const fraction=Math.max(0,Math.min(1,Number(cur[i])||0));setReveal(row,fraction);
+ let startX=0,startFraction=0,active=false,width=1;
+ cover.addEventListener('pointerdown',e=>{active=true;startX=e.clientX;startFraction=Math.max(0,Math.min(1,Number(cur[i])||0));width=Math.max(1,area.getBoundingClientRect().width);if(cover.setPointerCapture)cover.setPointerCapture(e.pointerId);e.preventDefault()});
+ cover.addEventListener('pointermove',e=>{if(!active)return;const moved=isLtr?(e.clientX-startX):(startX-e.clientX);const next=Math.max(0,Math.min(1,startFraction+moved/Math.max(1,width)));cur[i]=next;setReveal(row,next);updateProgress()});
+ const end=()=>{if(active){active=false;updateProgress()}};
+ cover.addEventListener('pointerup',end);cover.addEventListener('pointercancel',end);cover.addEventListener('lostpointercapture',end);
+ });updateProgress()}
+const fontSizeLabel=document.getElementById('fontSizeLabel');
+function applyFontScale(){const s=+(tabScales[viewMode]??1).toFixed(1);tabScales[viewMode]=s;document.documentElement.style.setProperty('--ar-scale',s);fontSizeLabel.textContent=`${Math.round(s*100)}%`}
+function setMode(m){viewMode=m;document.getElementById('modeAr').classList.toggle('active',m==='ar');document.getElementById('modeTr').classList.toggle('active',m==='tr');document.getElementById('modeEn').classList.toggle('active',m==='en');applyFontScale();render()}
+document.getElementById('modeAr').addEventListener('click',()=>setMode('ar'));
+document.getElementById('modeTr').addEventListener('click',()=>setMode('tr'));
+document.getElementById('modeEn').addEventListener('click',()=>setMode('en'));
+document.getElementById('fontSmaller').addEventListener('click',()=>{if(tabScales[viewMode]>0.8){tabScales[viewMode]-=0.1;applyFontScale()}});
+document.getElementById('fontBigger').addEventListener('click',()=>{if(tabScales[viewMode]<1.8){tabScales[viewMode]+=0.1;applyFontScale()}});
+document.getElementById('reset').addEventListener('click',()=>{if(confirm('Cover all 42 ayat in this tab again?')){saved[viewMode]={};render()}});
+document.getElementById('revealAll').addEventListener('click',()=>{const cur=modeSaved();surahData.forEach((_,i)=>cur[i]=1);render()});
+applyFontScale();
+render();
+</script>
+</body>
+</html>
